@@ -15,6 +15,17 @@
 
 
 
+     app.post('/dutycalculator/api', async function (req, res) {
+ countryCode = req.body.countryCode;
+ item = req.body.inputItem;
+
+
+
+
+
+        res.send('success:'+item)
+     });//end '/home'
+
 
 
 

@@ -46,12 +46,14 @@ $.each(function(){
 //      }))
 
 
-request('https://usitc.gov/sites/default/files/tata/hts/hts_2018_revision_14_data.json').pipe(JSONStream.parse('other')).pipe(es.mapSync(function (data) {
-    console.error(data)
-    console.log(data)
-    return data
-  }))
-
+// request('https://dutycalculator.herokuapp.com/json').pipe(JSONStream.parse('other')).pipe(es.mapSync(function (data) {
+//     console.error(data)
+//     console.log(data)
+//     return data
+//   }))
+request('https://dutycalculator.herokuapp.com/json').on('response',function(response){
+        console.log(response)
+});
 
 
 

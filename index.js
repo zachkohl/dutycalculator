@@ -1,7 +1,11 @@
 config = require('./config');
 
-config.app.get('/', function (req, res) {
-res.send('Hello John!')
+// config.app.get('/', function (req, res) {
+// res.send('Hello John!')
 
 
-});//end '/'
+// });//end '/'
+
+
+
+dutycalculator = require('./dutycalculator.js')(config);

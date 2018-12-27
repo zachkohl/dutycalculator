@@ -33,7 +33,9 @@
             </div>
             <input type="button" id="submitButton" value="find out your duty rate">
         </form>
+        <div id="table">
 
+        </div>
 
 
 
@@ -81,6 +83,7 @@
                             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                         }).done(function (msg) {
                             console.log('+++++++++++++++++++++++')
+                           updateTable(msg);
                             console.log(msg)
                             alert(msg)
                         
@@ -94,6 +97,53 @@
                
             
                 });//end on submitButton
+        example = [{
+            other: '',
+            indent: '0',
+            description: 'Live horses, asses, mules and hinnies:',
+            quotaQuantity: '',
+            special: '',
+            htsno: '0101',
+            addiitionalDuties: '',
+            footnotes: [],
+            general: '',
+            units: ''
+        }]
+    //EDIT THE DOM
+    function updateTable(msg){
+$('#table').empty();
+            tableHTML = ` 
+            <p>please select a tariff code</p>
+                       <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">htsno</th>
+                        <th scope="col">Description</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+            </table>`
+
+            $('#table').html(tableHTML);
+$.each(msg,function(index){
+            let htsno = this.htsno;
+            let description = this.description;
+            
+            let htmlId = "#itemDivId" + index;
+            let thisRow = this;
+
+
+            tableHTML = `
+    <tr  id='#row${index}'>
+      <th scope="row" id='#row${htsno}'>${htsno}</th>
+      <td id='#row${description}'>${description}</td>
+    </tr>`
+
+            $('#tableBody').append(tableHTML);
+})//end each
+    }//end updateTable
 
 
      })//end document ready       

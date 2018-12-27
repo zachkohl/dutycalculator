@@ -28,6 +28,25 @@ app.listen(PORT, () => console.log('Example app listening on port 80!')) //see S
 
 
 config.app = app;
+//MONGODB+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// const mongodb = require('mongodb');
+
+// mongodb.MongoClient.connect(process.env.MONGODB_URI, function(err, client) {
+
+//   if (err) throw err;
+
+//   var db = client.db('2018HTSARevision14');
+// })
+// config.db = db;
+
+
+
+
+
+
+
+
+
 // //Database +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // var { Pool, Client } = require('pg')
 

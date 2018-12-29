@@ -6,44 +6,44 @@
 
         </div>
     </header>
-<div id="dutyCalculator">
-    <main role="main" class="inner cover">
-        {{!-- JOHN: THIS IS THE PART YOU UPDATE --}}
-<p>This is text John would upate</p>
-{{!-- THIS IS THE END OF THE PART YOU UPDATE, DON"T DO ANYTHING BELOW THIS COMMENT --}}
-        <form class="login needs-validation" id="mainForm" novalidate="" method="post">
-            <div class="form-group row">
-                <label for="countryCode" class="col-sm-2 col-form-label">Country Code </label>
-                <div class="col-sm-10">
-                    <input type="text" name="countryCode" class="form-control inputlogin" required="">
-                    <div class="invalid-tooltip">
-                        country code is required
-                         </div>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label for="inputItem" class="col-sm-2 col-form-label">Item</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="">
-                    <div class="invalid-tooltip">
-                       item name is required
+    <div id="dutyCalculator">
+        <main role="main" class="inner cover">
+            {{!-- JOHN: THIS IS THE PART YOU UPDATE --}}
+            <p>This is text John would upate</p>
+            {{!-- THIS IS THE END OF THE PART YOU UPDATE, DON"T DO ANYTHING BELOW THIS COMMENT --}}
+            <form class="login needs-validation" id="mainForm" novalidate="" method="post">
+                <div class="form-group row">
+                    <label for="countryCode" class="col-sm-2 col-form-label">Country Code </label>
+                    <div class="col-sm-10">
+                        <input type="text" name="countryCode" class="form-control inputlogin" required="">
+                        <div class="invalid-tooltip">
+                            country code is required
+                        </div>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label for="inputItem" class="col-sm-2 col-form-label">Item</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="coffee">
+                        <div class="invalid-tooltip">
+                            item name is required
+                        </div>
+                    </div>
+
+                </div>
+                <input type="button" id="submitButton" value="find out your duty rate">
+            </form>
+            <div id="table">
 
             </div>
-            <input type="button" id="submitButton" value="find out your duty rate">
-        </form>
-        <div id="table">
-
-        </div>
+<div id="answerStuff"></div>
 
 
 
 
-
-    </main>
-</div>
-{{!-- End duty calculator --}}
+        </main>
+    </div>
+    {{!-- End duty calculator --}}
     <footer class="mastfoot mt-auto">
         <div class="inner">
             <div class="stargarnetReferral">
@@ -65,53 +65,60 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
     crossorigin="anonymous"></script>
 <script>
-        //setup
+    //setup
     $(document).ready(function () {
 
 
 
-                    $('#dutyCalculator').on('click', '#submitButton', function () {
-                
-                  
-                        let package = $('#mainForm').serializeArray();
+        $('#dutyCalculator').on('click', '#submitButton', function () {
 
-                        //package.push({ name: 'questionId', value: msg.questionId })
-                        $.ajax({
-                            url: "/dutycalculator/api",
-                            data: package,
-                            type: 'POST',
-                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-                        }).done(function (msg) {
-                            console.log('+++++++++++++++++++++++')
-                           updateTable(msg);
-                            console.log(msg)
-                            alert(msg)
-                        
-                        })//end done
-                            .fail(function (xhr, status, errorThrown) {
-                                alert("Sorry, there was a problem!");
-                                console.log("Error: " + errorThrown);
-                                console.log("Status: " + status);
-                                console.dir(xhr);
-                            })
-               
-            
-                });//end on submitButton
-        example = [{
-            other: '',
-            indent: '0',
-            description: 'Live horses, asses, mules and hinnies:',
-            quotaQuantity: '',
-            special: '',
-            htsno: '0101',
-            addiitionalDuties: '',
-            footnotes: [],
-            general: '',
-            units: ''
-        }]
-    //EDIT THE DOM
-    function updateTable(msg){
-$('#table').empty();
+
+            //let package = $('#mainForm').serializeArray();
+
+            //package.push({ name: 'questionId', value: msg.questionId })
+            $.ajax({
+                url: "dutycalculator/api/searchHTS",
+                data: 'searchTerm=' + $('#inputItem').val(),
+                type: 'GET',
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            }).done(function (msg) {
+                console.log('+++++++++++++++++++++++')
+                checkForMultipleTariffs(msg);
+                console.log(msg)
+
+
+            })//end done
+                .fail(function (xhr, status, errorThrown) {
+                    alert("Sorry, there was a problem!");
+                    console.log("Error: " + errorThrown);
+                    console.log("Status: " + status);
+                    console.dir(xhr);
+                })
+
+
+        });//end on submitButton
+        //ititial tariff search, check if it has more than one part
+        function checkForMultipleTariffs(msg) {
+            if (!$.isArray(msg)) {
+                alert('tariff api returned a non array value')
+                return;
+            }
+            if (msg.length > 1) {
+                updateTable(msg);
+                return;
+            }
+            readyToCalculate(msg);
+
+        }//end checkForMultipleTariffs
+
+        //TWO PATHS, the user either gets only one tariff code, or the user gets more than one, if more than one, the user is presented with a table that they can use to narrow their search criteria. 
+
+        //PATH 1
+        //Narrow Search criteria
+        //Display table of possible tariff codes for selection
+        function updateTable(msg) {
+            i = 0;
+            $('#table').empty();
             tableHTML = ` 
             <p>please select a tariff code</p>
                        <table class="table table-striped">
@@ -127,24 +134,295 @@ $('#table').empty();
             </table>`
 
             $('#table').html(tableHTML);
-$.each(msg,function(index){
-            let htsno = this.htsno;
-            let description = this.description;
-            
-            let htmlId = "#itemDivId" + index;
-            let thisRow = this;
+            $.each(msg, function (index) {
+                let htsno = this.htsno;
+                let description = this.description;
 
 
-            tableHTML = `
-    <tr  id='#row${index}'>
-      <th scope="row" id='#row${htsno}'>${htsno}</th>
-      <td id='#row${description}'>${description}</td>
+                let htmlId = "#itemDivId" + index;
+                let thisRow = this;
+                let spacing = ''
+                for (k = 0; k < this.indent; k++) {
+                    spacing = spacing + '     '
+                }
+
+                tableHTML = `
+    <tr  id='row${index}'>
+      <th scope="row" id='th${htsno}'>${htsno}</th>
+      <td id='td${description}' class="alignTableRight">${spacing}${description}</td>
     </tr>`
 
-            $('#tableBody').append(tableHTML);
-})//end each
-    }//end updateTable
+                $('#tableBody').append(tableHTML);
+                //add link 
+                /*
+                $('#table').on('click', `#row${htsno}`, function () {
+                                        $.ajax({
+                                            url: "dutycalculator/api/searchHTS",
+                                            data: 'searchTerm=' +htsno,
+                                            type: 'GET',
+                                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                                        }).done(function (msg) {
+                                            console.log('+++++++++++++++++++++++')
+                                           checkForMultipleTariffs(msg);
+                                            console.log(msg)
+                
+                                        
+                                        })//end done
+                                            .fail(function (xhr, status, errorThrown) {
+                                                alert("Sorry, there was a problem!");
+                                                console.log("Error: " + errorThrown);
+                                                console.log("Status: " + status);
+                                                console.dir(xhr);
+                                            })
+                                           
+                console.log(i)
+                })//end add link*/
+
+                if (htsno != '') {
 
 
-     })//end document ready       
+                    selector = `#row${index}`
+                    $(selector).mouseenter(function () {      
+                        $(`#row${index}`).css({ 'color': 'blue' })
+                    }).mouseout(function () {
+                        $(`#row${index}`).css({ 'color': '' })
+                    })
+                    //.mouseleave(function(){
+                    //     $(selector).css('color','red')
+                    //})//end hover
+                    $(selector).on('click', 'td, th', function () {
+                        //get the correct user information
+                        let searchTerm = htsno;
+                        $.ajax({
+                            url: "dutycalculator/api/searchHTS",
+                            data: 'searchTerm=' + searchTerm,
+                            type: 'GET',
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                        }).done(function (msg) {
+                            console.log('+++++++++++++++++++++++')
+                            checkForMultipleTariffs(msg);
+                            console.log(msg)
+
+
+                        })//end done
+                            .fail(function (xhr, status, errorThrown) {
+                                alert("Sorry, there was a problem!");
+                                console.log("Error: " + errorThrown);
+                                console.log("Status: " + status);
+                                console.dir(xhr);
+                            })
+
+                    })//end click
+                }//end if no htsno
+                else {
+                    selector = `#row${index}`
+                    $(selector).css('font-weight', 'bold')
+                }
+            })//end each
+        }//end updateTable
+
+
+        //PATH 2
+        //Calculate tariff value
+        function readyToCalculate(msg) {
+            $('#table').empty();
+            //go back to server
+            $.ajax({
+                url: "dutycalculator/api/getDuty",
+                data: 'searchTerm=' + msg[0].htsno,
+                type: 'GET',
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            }).done(function (msg) {
+                console.log('+++++++++++++++++++++++')
+                ReadyToCalculatePartB(msg)
+
+                console.log(msg)
+
+
+            })//end done
+                .fail(function (xhr, status, errorThrown) {
+                    alert("Sorry, there was a problem!");
+                    console.log("Error: " + errorThrown);
+                    console.log("Status: " + status);
+                    console.dir(xhr);
+                })
+
+            function ReadyToCalculatePartB(msg) {
+                $('#table').append('<p>Duty on this item:  ' + msg[0].general + '</p>')
+                if (typeof msg[0] === 'undefined') {
+                    console.log('msg is undefined')
+                    return;
+                }//end if msg is undefined.
+                if (typeof msg[0].added === 'undefined') {
+                    console.log('msg.added is undefined')
+                    selectCalculator(msg, msg[0].general);
+                    return;
+                }// end check if msg.added is undefined
+
+                if (typeof msg[0].added.nextUpGeneral === 'undefined') {
+                    selectCalculator(msg, msg[0].general);
+                    console.log('msg.added.nextUpGeneral is undefined')
+                    return;
+
+                }//end check if nextUpGeneral is undefined  
+
+                console.log(msg)
+
+                selectCalculator(msg, msg[0].added.nextUpGeneral);
+                $('#table').append('<p>Duty on next item up to have a thing:  ' + msg[0].added.nextUpGeneral + '</p>')
+
+
+
+
+
+            }//end ReadyToCalculatePartB
+
+
+
+        }//end readyToCalculate
+
+//build global variables for use later
+rateForFinalCalc = {};
+rateForFinalCalc.totalTariffAmount = 0;
+rateForFinalCalc.flag = false;
+
+        function selectCalculator(msg, rate) {
+            //Step 1, need to break up any + sign operators
+            rates = rate.split('+')
+            console.log(rates)
+            //do stuff to the rates
+            $.each(rates, function (index) {
+                rates[index] = rates[index].trim();
+                if (rates[index] === 'Free') {
+                    freeCalculator(msg, rates[index])
+                }
+                else if (rates[index].slice(-1) === '%') {
+                    percentCalculator(msg, rates[index])
+                }
+                else if (rates[index].indexOf('/') > -1) {
+                    perAmountCalculator(msg, rates[index])
+                } else {
+                    toComplicated();
+                }
+
+            })
+            console.log(rates)
+
+
+
+
+        }//end selectCalculator
+
+
+
+        
+        function freeCalculator(msg, rate) {
+            $('#table').append('<p>This item is free, no duty calculations necessary!</p>')
+        }//end percentCalculator
+
+
+        function percentCalculator(msg, rate) {
+
+console.log('flag 1')
+            $('#table').append('<p>please enter the value of the item</p>')
+            let html = `<div class="form-group">
+    <label for="valueOfItem">Value of Item</label>
+    <input type="number" class="form-control" id="valueOfItem" name="valueOfItem" required>`
+            $('#table').append(html)
+            console.log(rate)
+             rateForFinalCalc.percentRate = rate.slice(0,-1);
+            console.log(rateForFinalCalc.percentRate)
+            addCalculateButton();
+        }//end percentCalculator
+
+
+
+
+
+
+        function perAmountCalculator(msg, rate) {
+//this needs work
+
+
+
+
+            rateForFinalCalc.perAmountRate = {};
+           rateForFinalCalc.perAmountRate.splitOnSlash = rate.split('/');
+            rateForFinalCalc.perAmountRate.kindOfThing = rateForFinalCalc.perAmountRate.splitOnSlash[1];
+           
+            rateForFinalCalc.perAmountRate.amount = rateForFinalCalc.perAmountRate.splitOnSlash[0].slice(0, 0);
+//logic below adjust the amount based on currency
+ if(rateForFinalCalc.perAmountRate.splitOnSlash[0].charAt(0)==='$'){
+ rateForFinalCalc.perAmountRate.amount = rateForFinalCalc.perAmountRate.splitOnSlash[0].substr(1) //takes dollar sign off
+
+ }
+  if(rateForFinalCalc.perAmountRate.splitOnSlash[0].slice(-1)==='¢'){
+ rateForFinalCalc.perAmountRate.amount = rateForFinalCalc.perAmountRate.splitOnSlash[0].substr(0,rateForFinalCalc.perAmountRate.splitOnSlash[0].length -1)*.01//takes cents sign off and performs calculation
+ 
+ }
+
+console.log('perAmountRate.kindOfThing: '+rateForFinalCalc.perAmountRate.kindOfThing)
+console.log('perAmountRate.currency: '+rateForFinalCalc.perAmountRate.currency)
+console.log('perAmountRate.amount: '+rateForFinalCalc.perAmountRate.amount)
+
+
+            $('#table').append(`<p>amount of item in ${rateForFinalCalc.perAmountRate.kindOfThing}</p>`)
+            let html = `<div class="form-group">
+    <label for="amountOfItem">Amount in ${rateForFinalCalc.perAmountRate.kindOfThing}</label>
+    <input type="number" class="form-control" id="amountOfItem" name="amountOfItem" required>`
+            $('#table').append(html)
+          
+            addCalculateButton();
+        }//end perAmountCalculator
+        function toComplicated() {
+            $('#table').append('<p>This tariff code is to complicated for this calculator, please contact SteepleChase Customs Brokrage directly so we can help you out</p>')
+        }//end too complicated
+
+        //Actual calculations
+
+        if (($('#valueOfItem').length = 1) || ($('#amountOfItem').length = 1)){
+
+
+
+        function addCalculateButton(){
+                        if(rateForFinalCalc.flag===false){
+                            
+rateForFinalCalc.flag=true
+      
+            console.log('flag 2')
+            console.log(rateForFinalCalc.percentRate)
+ $('#finialOutput').empty();
+        $('#answerStuff').append(' <input type="button" id="calculateButton" value="calculate"> <div id="finialOutput"></div>')
+        $('#answerStuff').on('click', '#calculateButton', function () {
+            rateForFinalCalc.totalTariffAmount= 0;
+            console.log(rateForFinalCalc.percentRate)
+            if ($('#valueOfItem').length = 1) {
+                let valueOfItem = $('#valueOfItem').val();
+                rateForFinalCalc.totalTariffAmount = rateForFinalCalc.totalTariffAmount + ((valueOfItem / 100) * rateForFinalCalc.percentRate)
+                roundThis =rateForFinalCalc.totalTariffAmount;
+                roundThis.toFixed(2);
+                rateForFinalCalc.totalTariffAmount = roundThis;
+                console.log(rateForFinalCalc.totalTariffAmount)
+            }
+                       if ($('#amountOfItem').length = 1) {
+                let amountOfItem = $('#amountOfItem').val();
+
+
+
+
+                 rateForFinalCalc.totalTariffAmount = rateForFinalCalc.totalTariffAmount + ((amountOfItem / 100) * rateForFinalCalc.perAmountRate.amount)
+                roundThis =rateForFinalCalc.totalTariffAmount;
+                roundThis.toFixed(2);
+                rateForFinalCalc.totalTariffAmount = roundThis;
+            }
+
+            $('#finialOutput').append('tariff amount: ' + rateForFinalCalc.totalTariffAmount);
+            
+        })//end click calculate 
+              }//end flag test
+ 
+        }
+        
+    }//end check if valueOfItem or amountOfItem
+    })//end document ready       
 </script>

@@ -143,3 +143,10 @@ width:400px;
   margin-left: 2em;
   margin-right: auto;
 }
+
+/*DUTY CALCULATOR*/
+
+.alignTableRight{
+  white-space:pre-wrap;
+  text-align:start;
+}

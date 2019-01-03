@@ -1,7 +1,7 @@
 <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
     <header class="masthead mb-auto">
         <div class="inner">
-            <h1 class="masthead-brand">Duty Calculator</h1>
+            <h1 class="masthead-brand">Duty Estimator</h1>
             <h2>Enter Info</h2>
 
         </div>
@@ -9,28 +9,38 @@
     <div id="dutyCalculator">
         <main role="main" class="inner cover">
             {{!-- JOHN: THIS IS THE PART YOU UPDATE --}}
-            <p>This is text John would upate</p>
+     
             {{!-- THIS IS THE END OF THE PART YOU UPDATE, DON"T DO ANYTHING BELOW THIS COMMENT --}}
-            <form class="login needs-validation" id="mainForm" novalidate="" method="post">
+            <form class="login needs-validation" id="mainForm" novalidate="">
+                  <div id="countrySelector">
                 <div class="form-group row">
-                    <label for="countryCode" class="col-sm-2 col-form-label">Country Code </label>
-                    <div class="col-sm-10">
-                        <input type="text" name="countryCode" class="form-control inputlogin" required="">
+        
+          <label for="exampleFormControlSelect1" class="col-sm-3 col-form-label">Select origin</label>
+          <div class="col-sm-9">
+    <select class="form-control inputlogin" id="exampleFormControlSelect1">
+     {{#each countries}}
+      <option>{{this}}</option>
+      {{/each}}
+    </select>
                         <div class="invalid-tooltip">
                             country code is required
                         </div>
                     </div>
-                </div>
+                    </div>
+                    </div>
+                    {{!-- end country selector --}}
                 <div class="form-group row">
-                    <label for="inputItem" class="col-sm-2 col-form-label">Item</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="coffee">
+              
+                    <label for="inputItem" class="col-sm-3 col-form-label">Item Description</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="1202.41.40.20"> 
+                        {{!-- coffee --}}
                         <div class="invalid-tooltip">
                             item name is required
                         </div>
                     </div>
-
-                </div>
+                    </div>
+          
                 <input type="button" id="submitButton" value="find out your duty rate">
             </form>
             <div id="table">
@@ -69,13 +79,13 @@
     $(document).ready(function () {
 
 
-
         $('#dutyCalculator').on('click', '#submitButton', function () {
 
 
             //let package = $('#mainForm').serializeArray();
 
             //package.push({ name: 'questionId', value: msg.questionId })
+         
             $.ajax({
                 url: "dutycalculator/api/searchHTS",
                 data: 'searchTerm=' + $('#inputItem').val(),
@@ -199,9 +209,9 @@
                             type: 'GET',
                             contentType: "application/x-www-form-urlencoded; charset=UTF-8",
                         }).done(function (msg) {
-                            console.log('+++++++++++++++++++++++')
+                          
                             checkForMultipleTariffs(msg);
-                            console.log(msg)
+                    
 
 
                         })//end done
@@ -225,11 +235,21 @@
         //PATH 2
         //Calculate tariff value
         function readyToCalculate(msg) {
-            $('#table').empty();
+//Now that things are getting serious, we need to add a handler to make sure that if the user changes the country value, it refires
+$('#countrySelector').off();
+$('#countrySelector').on('change','#exampleFormControlSelect1',function(){
+    getDuty(msg);
+
+})
+
             //go back to server
+            getDuty(msg);
+
+    function getDuty(msg){
+            $('#table').empty();
             $.ajax({
                 url: "dutycalculator/api/getDuty",
-                data: 'searchTerm=' + msg[0].htsno,
+                data: 'searchTerm=' + msg[0].htsno +'&origin='+$('#exampleFormControlSelect1').val(),
                 type: 'GET',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             }).done(function (msg) {
@@ -247,29 +267,16 @@
                     console.dir(xhr);
                 })
 
-            function ReadyToCalculatePartB(msg) {
-                $('#table').append('<p>Duty on this item:  ' + msg[0].general + '</p>')
-                if (typeof msg[0] === 'undefined') {
-                    console.log('msg is undefined')
+            function ReadyToCalculatePartB(RawTariff) {
+                $('#table').append('<p>Duty on this item:  ' + RawTariff + '</p>')
+                if (typeof RawTariff === 'undefined') {
+                    console.log('RawTariff is undefined')
                     return;
                 }//end if msg is undefined.
-                if (typeof msg[0].added === 'undefined') {
-                    console.log('msg.added is undefined')
-                    selectCalculator(msg, msg[0].general);
-                    return;
-                }// end check if msg.added is undefined
+                
 
-                if (typeof msg[0].added.nextUpGeneral === 'undefined') {
-                    selectCalculator(msg, msg[0].general);
-                    console.log('msg.added.nextUpGeneral is undefined')
-                    return;
 
-                }//end check if nextUpGeneral is undefined  
-
-                console.log(msg)
-
-                selectCalculator(msg, msg[0].added.nextUpGeneral);
-                $('#table').append('<p>Duty on next item up to have a thing:  ' + msg[0].added.nextUpGeneral + '</p>')
+                selectCalculator(RawTariff);
 
 
 
@@ -277,7 +284,7 @@
 
             }//end ReadyToCalculatePartB
 
-
+    }//end getDuty
 
         }//end readyToCalculate
 
@@ -286,27 +293,27 @@ rateForFinalCalc = {};
 rateForFinalCalc.totalTariffAmount = 0;
 rateForFinalCalc.flag = false;
 
-        function selectCalculator(msg, rate) {
+        function selectCalculator(RawTariff) {
             //Step 1, need to break up any + sign operators
-            rates = rate.split('+')
-            console.log(rates)
+            rates = RawTariff.split('+')
+   
             //do stuff to the rates
             $.each(rates, function (index) {
                 rates[index] = rates[index].trim();
                 if (rates[index] === 'Free') {
-                    freeCalculator(msg, rates[index])
+                    freeCalculator(RawTariff)
                 }
                 else if (rates[index].slice(-1) === '%') {
-                    percentCalculator(msg, rates[index])
+                    percentCalculator(RawTariff)
                 }
                 else if (rates[index].indexOf('/') > -1) {
-                    perAmountCalculator(msg, rates[index])
+                    perAmountCalculator(RawTariff)
                 } else {
                     toComplicated();
                 }
 
             })
-            console.log(rates)
+           
 
 
 
@@ -316,22 +323,22 @@ rateForFinalCalc.flag = false;
 
 
         
-        function freeCalculator(msg, rate) {
+        function freeCalculator(RawTariff) {
             $('#table').append('<p>This item is free, no duty calculations necessary!</p>')
         }//end percentCalculator
 
 
-        function percentCalculator(msg, rate) {
+        function percentCalculator(rate) {
 
-console.log('flag 1')
+
             $('#table').append('<p>please enter the value of the item</p>')
             let html = `<div class="form-group">
     <label for="valueOfItem">Value of Item</label>
     <input type="number" class="form-control" id="valueOfItem" name="valueOfItem" required>`
             $('#table').append(html)
-            console.log(rate)
+       
              rateForFinalCalc.percentRate = rate.slice(0,-1);
-            console.log(rateForFinalCalc.percentRate)
+
             addCalculateButton();
         }//end percentCalculator
 
@@ -340,7 +347,7 @@ console.log('flag 1')
 
 
 
-        function perAmountCalculator(msg, rate) {
+        function perAmountCalculator( rate) {
 //this needs work
 
 
@@ -354,15 +361,16 @@ console.log('flag 1')
 //logic below adjust the amount based on currency
  if(rateForFinalCalc.perAmountRate.splitOnSlash[0].charAt(0)==='$'){
  rateForFinalCalc.perAmountRate.amount = rateForFinalCalc.perAmountRate.splitOnSlash[0].substr(1) //takes dollar sign off
-
+console.log('got inside dollar sign')
  }
-  if(rateForFinalCalc.perAmountRate.splitOnSlash[0].slice(-1)==='¢'){
+ console.log(rateForFinalCalc.perAmountRate.splitOnSlash[0])
+  if(rateForFinalCalc.perAmountRate.splitOnSlash[0].charAt(rateForFinalCalc.perAmountRate.splitOnSlash[0].length-1)==='¢'){
+      console.log('got to ¢')
  rateForFinalCalc.perAmountRate.amount = rateForFinalCalc.perAmountRate.splitOnSlash[0].substr(0,rateForFinalCalc.perAmountRate.splitOnSlash[0].length -1)*.01//takes cents sign off and performs calculation
  
  }
 
 console.log('perAmountRate.kindOfThing: '+rateForFinalCalc.perAmountRate.kindOfThing)
-console.log('perAmountRate.currency: '+rateForFinalCalc.perAmountRate.currency)
 console.log('perAmountRate.amount: '+rateForFinalCalc.perAmountRate.amount)
 
 
@@ -389,14 +397,14 @@ console.log('perAmountRate.amount: '+rateForFinalCalc.perAmountRate.amount)
                             
 rateForFinalCalc.flag=true
       
-            console.log('flag 2')
-            console.log(rateForFinalCalc.percentRate)
+
  $('#finialOutput').empty();
         $('#answerStuff').append(' <input type="button" id="calculateButton" value="calculate"> <div id="finialOutput"></div>')
         $('#answerStuff').on('click', '#calculateButton', function () {
             rateForFinalCalc.totalTariffAmount= 0;
-            console.log(rateForFinalCalc.percentRate)
-            if ($('#valueOfItem').length = 1) {
+            console.log('inside click calculateButton')
+            if ($('#valueOfItem').length === 1) {
+                console.log('got inside if percent value')
                 let valueOfItem = $('#valueOfItem').val();
                 rateForFinalCalc.totalTariffAmount = rateForFinalCalc.totalTariffAmount + ((valueOfItem / 100) * rateForFinalCalc.percentRate)
                 roundThis =rateForFinalCalc.totalTariffAmount;
@@ -404,7 +412,7 @@ rateForFinalCalc.flag=true
                 rateForFinalCalc.totalTariffAmount = roundThis;
                 console.log(rateForFinalCalc.totalTariffAmount)
             }
-                       if ($('#amountOfItem').length = 1) {
+                       if ($('#amountOfItem').length === 1) {
                 let amountOfItem = $('#amountOfItem').val();
 
 
@@ -415,7 +423,10 @@ rateForFinalCalc.flag=true
                 roundThis.toFixed(2);
                 rateForFinalCalc.totalTariffAmount = roundThis;
             }
-
+                roundThis =rateForFinalCalc.totalTariffAmount;
+                roundThis = roundThis.toFixed(2);
+                rateForFinalCalc.totalTariffAmount = roundThis;
+                 $('#finialOutput').empty();
             $('#finialOutput').append('tariff amount: ' + rateForFinalCalc.totalTariffAmount);
             
         })//end click calculate 

@@ -8,47 +8,7 @@
     </header>
     <div id="dutyCalculator">
         <main role="main" class="inner cover">
-            {{!-- JOHN: THIS IS THE PART YOU UPDATE --}}
-     
-            {{!-- THIS IS THE END OF THE PART YOU UPDATE, DON"T DO ANYTHING BELOW THIS COMMENT --}}
-            <form class="login needs-validation" id="mainForm" novalidate="">
-                  <div id="countrySelector">
-                <div class="form-group row">
-        
-          <label for="exampleFormControlSelect1" class="col-sm-3 col-form-label">Select origin</label>
-          <div class="col-sm-9">
-    <select class="form-control inputlogin" id="exampleFormControlSelect1">
-     {{#each countries}}
-      <option>{{this}}</option>
-      {{/each}}
-    </select>
-                        <div class="invalid-tooltip">
-                            country code is required
-                        </div>
-                    </div>
-                    </div>
-                    </div>
-                    {{!-- end country selector --}}
-                <div class="form-group row">
-              
-                    <label for="inputItem" class="col-sm-3 col-form-label">Item Description</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="1202.41.40.20"> 
-                        {{!-- coffee --}}
-                        <div class="invalid-tooltip">
-                            item name is required
-                        </div>
-                    </div>
-                    </div>
-          
-                <input type="button" id="submitButton" value="find out your duty rate">
-            </form>
-            <div id="table">
-
-            </div>
-<div id="answerStuff"></div>
-
-
+<div id="jqueryContent"></div>
 
 
         </main>
@@ -77,7 +37,67 @@
 <script>
     //setup
     $(document).ready(function () {
+        resetContent()
+function resetContent(){
+$('#jqueryContent').off()
+$('#jqueryContent').empty()
+$('#answerStuff').empty()
 
+let html = `            <form class="login needs-validation" id="mainForm" novalidate="">
+                  <div id="countrySelector">
+                <div class="form-group row">
+        
+          <label for="exampleFormControlSelect1" class="col-sm-3 col-form-label">Select origin</label>
+          <div class="col-sm-9">
+    <select class="form-control inputlogin" id="exampleFormControlSelect1">
+     {{#each countries}}
+      <option>{{this}}</option>
+      {{/each}}
+    </select>
+                        <div class="invalid-tooltip">
+                            country code is required
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+                    {{!-- end country selector --}}
+                    <div id="inputStuff">
+                <div class="form-group row">
+              
+                    <label for="inputItem" class="col-sm-3 col-form-label">Item Description</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="1204.00.00.10"> 
+                        {{!-- coffee --}}
+                        <div class="invalid-tooltip">
+                            item name is required
+                        </div>
+                    </div>
+                    </div>
+          
+                <input type="button" id="submitButton" value="find out your duty rate">
+                </div>
+
+
+
+
+
+            </form>
+            <div id="table">
+
+            </div>
+<form class="login needs-validation" id="calculateForm" novalidate="">
+<div id="answerStuff"></div>
+
+
+
+
+</form
+
+
+
+`
+$('#jqueryContent').html(html)
+}//end reset content
 
         $('#dutyCalculator').on('click', '#submitButton', function () {
 
@@ -104,7 +124,13 @@
                     console.log("Status: " + status);
                     console.dir(xhr);
                 })
-
+//update the DOM to remove Item Description, find out your duty rate button
+//add reset button
+$('#inputStuff').empty()
+$('#inputStuff').html('<input type="button" id="resetButton" value="reset">')
+$('#inputStuff').on('click','#resetButton',function(){
+       resetContent()
+})
 
         });//end on submitButton
         //ititial tariff search, check if it has more than one part
@@ -129,7 +155,7 @@
         function updateTable(msg) {
             i = 0;
             $('#table').empty();
-            tableHTML = ` 
+            tableHTML = `<br> 
             <p>please select a tariff code</p>
                        <table class="table table-striped">
                 <thead>
@@ -252,9 +278,9 @@ $('#countrySelector').on('change','#exampleFormControlSelect1',function(){
                 data: 'searchTerm=' + msg[0].htsno +'&origin='+$('#exampleFormControlSelect1').val(),
                 type: 'GET',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-            }).done(function (msg) {
+            }).done(function (RawTariff) {
                 console.log('+++++++++++++++++++++++')
-                ReadyToCalculatePartB(msg)
+                ReadyToCalculatePartB(RawTariff,msg)
 
                 console.log(msg)
 
@@ -267,8 +293,14 @@ $('#countrySelector').on('change','#exampleFormControlSelect1',function(){
                     console.dir(xhr);
                 })
 
-            function ReadyToCalculatePartB(RawTariff) {
-                $('#table').append('<p>Duty on this item:  ' + RawTariff + '</p>')
+            function ReadyToCalculatePartB(RawTariff,msg) {
+                let html = `<br>
+                <p>Item HTSNO: ${msg[0].htsno}</p>
+                <p>Item description: ${msg[0].description}</p>
+                <br>
+                <p>Duty on this item:  ${RawTariff}</p>
+                `
+                $('#table').append(html)
                 if (typeof RawTariff === 'undefined') {
                     console.log('RawTariff is undefined')
                     return;
@@ -331,11 +363,17 @@ rateForFinalCalc.flag = false;
         function percentCalculator(rate) {
 
 
-            $('#table').append('<p>please enter the value of the item</p>')
-            let html = `<div class="form-group">
-    <label for="valueOfItem">Value of Item</label>
-    <input type="number" class="form-control" id="valueOfItem" name="valueOfItem" required>`
-            $('#table').append(html)
+     
+            let html = `
+<p>please enter the value of the item in USD</p>
+            <div class="form-group row">
+    <label for="valueOfItem" class="col-sm-3 col-form-label">Value of Item in USD</label>
+     <div class="col-sm-9">
+    <input type="number" class="form-control inputlogin" id="valueOfItem" name="valueOfItem" required>
+      </div>
+      </div>
+      `
+            $('#answerStuff').append(html)
        
              rateForFinalCalc.percentRate = rate.slice(0,-1);
 
@@ -373,12 +411,15 @@ console.log('got inside dollar sign')
 console.log('perAmountRate.kindOfThing: '+rateForFinalCalc.perAmountRate.kindOfThing)
 console.log('perAmountRate.amount: '+rateForFinalCalc.perAmountRate.amount)
 
-
-            $('#table').append(`<p>amount of item in ${rateForFinalCalc.perAmountRate.kindOfThing}</p>`)
-            let html = `<div class="form-group">
-    <label for="amountOfItem">Amount in ${rateForFinalCalc.perAmountRate.kindOfThing}</label>
-    <input type="number" class="form-control" id="amountOfItem" name="amountOfItem" required>`
-            $('#table').append(html)
+            let html = `
+    <p>please enter amount of item in ${rateForFinalCalc.perAmountRate.kindOfThing}</p>
+    <div class="form-group row">
+    <label for="amountOfItem" class="col-sm-3 col-form-label">Amount in ${rateForFinalCalc.perAmountRate.kindOfThing}</label>
+    <div class="col-sm-9">
+    <input type="number" class="form-control inputlogin" id="amountOfItem" name="amountOfItem" required>
+    </div>
+    </div>`
+            $('#answerStuff').append(html)
           
             addCalculateButton();
         }//end perAmountCalculator
@@ -393,13 +434,13 @@ console.log('perAmountRate.amount: '+rateForFinalCalc.perAmountRate.amount)
 
 
         function addCalculateButton(){
-                        if(rateForFinalCalc.flag===false){
+                        if($('#calculateButton').length === 0){
                             
 rateForFinalCalc.flag=true
       
 
  $('#finialOutput').empty();
-        $('#answerStuff').append(' <input type="button" id="calculateButton" value="calculate"> <div id="finialOutput"></div>')
+        $('#answerStuff').append('<div id="finialOutput"></div> <input type="button" id="calculateButton" value="calculate"><p></p> ')
         $('#answerStuff').on('click', '#calculateButton', function () {
             rateForFinalCalc.totalTariffAmount= 0;
             console.log('inside click calculateButton')
@@ -418,7 +459,7 @@ rateForFinalCalc.flag=true
 
 
 
-                 rateForFinalCalc.totalTariffAmount = rateForFinalCalc.totalTariffAmount + ((amountOfItem / 100) * rateForFinalCalc.perAmountRate.amount)
+                 rateForFinalCalc.totalTariffAmount = rateForFinalCalc.totalTariffAmount + ((amountOfItem) * rateForFinalCalc.perAmountRate.amount)
                 roundThis =rateForFinalCalc.totalTariffAmount;
                 roundThis.toFixed(2);
                 rateForFinalCalc.totalTariffAmount = roundThis;
@@ -427,10 +468,11 @@ rateForFinalCalc.flag=true
                 roundThis = roundThis.toFixed(2);
                 rateForFinalCalc.totalTariffAmount = roundThis;
                  $('#finialOutput').empty();
-            $('#finialOutput').append('tariff amount: ' + rateForFinalCalc.totalTariffAmount);
+                 let finialOutHTML =`<p>tariff amount: $${ rateForFinalCalc.totalTariffAmount}</p>`
+            $('#finialOutput').append(finialOutHTML);
             
         })//end click calculate 
-              }//end flag test
+              }//end if we don't have a calculator button
  
         }
         

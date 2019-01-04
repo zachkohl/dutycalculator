@@ -311,7 +311,7 @@ $('#countrySelector').on('change','#exampleFormControlSelect1',function(){
                 $('#table').append(html)
 
       //get info for item history:
-     /* $.ajax({
+      $.ajax({
                 url: "dutycalculator/api/getHistory",
                 data: 'searchTerm=' + msg[0].htsno,
                 type: 'GET',
@@ -330,7 +330,7 @@ $('#countrySelector').on('change','#exampleFormControlSelect1',function(){
                     console.log("Status: " + status);
                     console.dir(xhr);
                 })
-                */
+                
 
 
                 selectCalculator(RawTariff);

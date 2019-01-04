@@ -265,44 +265,60 @@ function modelForExport(config) {
  for (i = 0; i < htsData.length; i++) {
      if (htsData[i].htsno === item) {
 //found our item in the big table, now we can workbackwards adding descriptions as we go. 
-console.log(htsData[i])
-if(htsData[i].indent>0){
-    
-}
-        //  //check for indents
-        //  let j = i;
-        //  let done = false;
-        //  while (!done) {
-        //      j++;
+console.log('got inside correct answer')
 
-        //      if (typeof htsData[j] === 'undefined') {
-        //          done = true;
-        //          console.log('flag ' + j)
-        //          break;
-        //          if (typeof htsData[j].indent === 'undefined') {
-        //              console.log('item ' + j + ' does not have indent value')
-        //              done = true;
-        //              break;
+startIndent = htsData[i].indent;
+var indentArray = [];
+indentArray.push({description:htsData[i].description,htsno:htsData[i].htsno})
+let m = 1;
+findNextIndent(i,startIndent)
+function findNextIndent(z,startIndent){
+    console.log('got inside FindNextIndent '+m+" times")
+    m++;
+j = z;
+let thisIndent = htsData[j].indent
+while(thisIndent>0 && j>0 ){
+    j--;
+ thisIndent = htsData[j].indent
+if( thisIndent  < startIndent){
+    console.log(htsData[j].htsno)
+    indentArray.push({description:htsData[j].description,htsno:htsData[j].htsno});
+    findNextIndent(j,thisIndent);
+    return;
+}//end if
 
-        //          }
+}//end while loop
 
-
-        //      }
-        //      else {
-        //          if (htsData[j].indent > htsData[i].indent) {
-        //              result.push(htsData[j]);
-        //          } else {
-        //              done = true;
-        //          }
-        //      }
-
-        //  }//end while loop
-break;
+}//end function findNextIndent
+break; //leave the big for loop
      }//end if a good answer test
  }//end for loop
 
+//build html
 
-     res.send('test')
+let html = '<p>Description Tree</p><ul>';
+n= indentArray.length
+while(n>0){
+    n--;
+    //calculate indent:
+    let spacing = ''
+    for (k = 0; k < n; k++) {
+        spacing = spacing + '     '
+    }//end spacing    
+    html = html + `<li>${spacing}${indentArray[n].description}</li>`;
+    }//end for loop
+html = html + '</ul>'
+// for(let n=0;n<indentArray.length;n++){
+// //calculate indent:
+// let spacing = ''
+// for (k = 0; k < n; k++) {
+//     spacing = spacing + '     '
+// }//end spacing    
+// html = html + `<p>${spacing}${indentArray[n].description}</p>`;
+// }//end for loop
+//html = html + `<p><strong>${spacing}${indentArray[n].description}</strong></p>`
+
+     res.send(html)
  })//getHistory
 
 

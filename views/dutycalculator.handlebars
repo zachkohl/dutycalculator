@@ -66,8 +66,8 @@ let html = `            <form class="login needs-validation" id="mainForm" noval
               
                     <label for="inputItem" class="col-sm-3 col-form-label">Item Description</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" value="1204.00.00.10"> 
-                        {{!-- coffee --}}
+                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item" required="" > 
+                        {{!--  value="coffee" --}}
                         <div class="invalid-tooltip">
                             item name is required
                         </div>
@@ -100,7 +100,10 @@ $('#jqueryContent').html(html)
 }//end reset content
 
         $('#dutyCalculator').on('click', '#submitButton', function () {
-
+if(($('#inputItem').val())===''){
+    alert('must enter an item')
+    return;
+}
 
             //let package = $('#mainForm').serializeArray();
 
@@ -294,18 +297,40 @@ $('#countrySelector').on('change','#exampleFormControlSelect1',function(){
                 })
 
             function ReadyToCalculatePartB(RawTariff,msg) {
+                          if (typeof RawTariff === 'undefined') {
+                    console.log('RawTariff is undefined')
+                    return;
+                }//end if msg is undefined.
+
                 let html = `<br>
                 <p>Item HTSNO: ${msg[0].htsno}</p>
-                <p>Item description: ${msg[0].description}</p>
+                <p id="ItemDescription">Item description: ${msg[0].description}</p>
                 <br>
                 <p>Duty on this item:  ${RawTariff}</p>
                 `
                 $('#table').append(html)
-                if (typeof RawTariff === 'undefined') {
-                    console.log('RawTariff is undefined')
-                    return;
-                }//end if msg is undefined.
-                
+
+      //get info for item history:
+     /* $.ajax({
+                url: "dutycalculator/api/getHistory",
+                data: 'searchTerm=' + msg[0].htsno,
+                type: 'GET',
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            }).done(function (history) {
+                console.log('+++++++++++++++++++++++')
+                $('#ItemDescription').after(history)
+
+                console.log(msg)
+
+
+            })//end done
+                .fail(function (xhr, status, errorThrown) {
+                    alert("Sorry, there was a problem!");
+                    console.log("Error: " + errorThrown);
+                    console.log("Status: " + status);
+                    console.dir(xhr);
+                })
+                */
 
 
                 selectCalculator(RawTariff);

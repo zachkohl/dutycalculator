@@ -250,7 +250,60 @@ function modelForExport(config) {
     })//end getDuty
 
 
+ app.get('/dutycalculator/api/getHistory',async function(req,res){
+    
+ // countryCode = req.query.countryCode;
+ item = req.query.searchTerm
+ console.log(item)
 
+ 
+
+
+
+ result = []
+
+ for (i = 0; i < htsData.length; i++) {
+     if (htsData[i].htsno === item) {
+//found our item in the big table, now we can workbackwards adding descriptions as we go. 
+console.log(htsData[i])
+if(htsData[i].indent>0){
+    
+}
+        //  //check for indents
+        //  let j = i;
+        //  let done = false;
+        //  while (!done) {
+        //      j++;
+
+        //      if (typeof htsData[j] === 'undefined') {
+        //          done = true;
+        //          console.log('flag ' + j)
+        //          break;
+        //          if (typeof htsData[j].indent === 'undefined') {
+        //              console.log('item ' + j + ' does not have indent value')
+        //              done = true;
+        //              break;
+
+        //          }
+
+
+        //      }
+        //      else {
+        //          if (htsData[j].indent > htsData[i].indent) {
+        //              result.push(htsData[j]);
+        //          } else {
+        //              done = true;
+        //          }
+        //      }
+
+        //  }//end while loop
+break;
+     }//end if a good answer test
+ }//end for loop
+
+
+     res.send('test')
+ })//getHistory
 
 
 

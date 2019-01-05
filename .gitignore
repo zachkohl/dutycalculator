@@ -61,7 +61,7 @@ typings/
 .next
 
 #json data
-hts_2018_revision_14_data.json
+#hts_2018_revision_14_data.json
 
 #tempBackup
 tempBackup

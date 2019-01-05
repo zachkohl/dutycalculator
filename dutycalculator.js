@@ -7,25 +7,29 @@ function modelForExport(config) {
     var fs = require('fs');
     const request = require('request');
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    var htsData;
-    if (process.env.NODE_ENV !== 'production') {
-        require('dotenv').load();
-        fs.readFile('hts_2018_revision_14_data.json', 'utf8', function (err, data) {
-            if (err) throw err;
-            htsData = JSON.parse(data)
-        })//end read file. 
-    } else {
-        request('https://usitc.gov/sites/default/files/tata/hts/hts_2018_revision_14_data.json', function (error, response, body) {
-            console.log('error:', error); // Print the error if one occurred
-            console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-            htsData = JSON.parse(body)
-        });
-    }
-    var countryInfo
-    fs.readFile('dataCleaning/countryInfo.json', 'utf8', function (err, data) {
-        if (err) throw err;
-        countryInfo = JSON.parse(data)
-    })//end read file. 
+    // var htsData;
+    // if (process.env.NODE_ENV !== 'production') {
+    //     require('dotenv').load();
+    //     fs.readFile('hts_2018_revision_14_data.json', 'utf8', function (err, data) {
+    //         if (err) throw err;
+    //         htsData = JSON.parse(data)
+    //     })//end read file. 
+    // } else {
+    //     request('https://usitc.gov/sites/default/files/tata/hts/hts_2018_revision_14_data.json', function (error, response, body) {
+    //         console.log('error:', error); // Print the error if one occurred
+    //         console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    //         htsData = JSON.parse(body)
+    //     });
+    // }
+    // var countryInfo
+    // fs.readFile('dataCleaning/countryInfo.json', 'utf8', function (err, data) {
+    //     if (err) throw err;
+    //     countryInfo = JSON.parse(data)
+    // })//end read file. 
+
+    var htsData=   JSON.parse(fs.readFileSync('hts_2018_revision_14_data.json','utf8')); 
+
+    var countryInfo =   JSON.parse(fs.readFileSync('dataCleaning/countryInfo.json','utf8')); 
 
 
     app.get('/', async function (req, res) {

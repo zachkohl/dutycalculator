@@ -24,10 +24,23 @@ app.set('view engine', 'handlebars');
 //app.set('views', [path.join(__dirname,'views'),path.join(__dirname,'views','test')]);
 app.set('views','./views')
 app.use(express.static('static'));
-app.listen(PORT, () => console.log('Example app listening on port 80!')) //see Socket.io below for new implementation
+//app.listen(PORT, () => console.log('Example app listening on port 80!')) //normal implementation //see cors implementation below //see Socket.io implementation below 
 
 
 config.app = app;
+
+//CORS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+var cors = require('cors')
+app.use(cors())
+ 
+app.get('/products/:id', function (req, res, next) {
+  res.json({msg: 'This is CORS-enabled for all origins!'})
+})
+ 
+app.listen(80, function () {
+  console.log('CORS-enabled web server listening on port 80')
+})
+
 //MONGODB+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // const mongodb = require('mongodb');
 

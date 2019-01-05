@@ -300,7 +300,7 @@ break; //leave the big for loop
 
 //build html
 
-let html = '<p>Description Tree</p><ul>';
+let html = '<p>Description Tree</p><div id="descriptionTree"><ul>';
 n= indentArray.length
 while(n>0){
     n--;
@@ -311,7 +311,7 @@ while(n>0){
     }//end spacing    
     html = html + `<li>${spacing}${indentArray[n].description}</li>`;
     }//end for loop
-html = html + '</ul>'
+html = html + '</ul></div>'
 // for(let n=0;n<indentArray.length;n++){
 // //calculate indent:
 // let spacing = ''

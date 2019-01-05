@@ -150,3 +150,8 @@ width:400px;
   white-space:pre-wrap;
   text-align:start;
 }
+
+#descriptionTree{
+  padding-left:0pt;
+  text-align:left;
+}

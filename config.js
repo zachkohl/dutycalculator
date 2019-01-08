@@ -45,7 +45,7 @@ config.app = app;
 app.use(function(req,res,next){
     res.set(
     {
-'X-Frame-Options':'allow-from https://developer.mozilla.org'});
+'X-Frame-Options':'allow-from https://steeplechasechb.com'});
    // res.set('Access-Control-Allow-Headers','Origin, X-Requested-With, Content-Type, Accept');
     next();
 })

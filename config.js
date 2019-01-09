@@ -24,7 +24,7 @@ app.set('view engine', 'handlebars');
 //app.set('views', [path.join(__dirname,'views'),path.join(__dirname,'views','test')]);
 app.set('views','./views')
 app.use(express.static('static'));
-app.listen(PORT, () => console.log('Example app listening on port 80!')) //normal implementation //see cors implementation below //see Socket.io implementation below 
+app.listen(PORT, () => console.log('app listening')) //normal implementation //see cors implementation below //see Socket.io implementation below 
 
 
 config.app = app;

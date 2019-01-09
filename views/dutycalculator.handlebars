@@ -122,7 +122,7 @@
                 type: 'GET',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             }).done(function (msg) {
-                console.log(msg)
+           
                 if($.isEmptyObject(msg)){
                     alert('Please enter an item description that is in the USITC data set. Perhaps try something like "bicycle" instead of "bike".')
                 }
@@ -195,7 +195,7 @@
                 }
 
                 tableHTML = `
-    <tr  id='row${index}'>
+    <tr  id='rowX${index}'>
       <th scope="row" id='th${htsno}'>${htsno}</th>
       <td id='td${description}' class="alignTableRight">${spacing}${description}</td>
     </tr>`
@@ -231,11 +231,11 @@
                 if (htsno != '') {
 
 
-                    selector = `#row${index}`
+                    selector = `#rowX${index}`
                     $(selector).mouseenter(function () {
-                        $(`#row${index}`).css({ 'color': 'blue' })
+                        $(`#rowX${index}`).css({ 'color': 'blue' })
                     }).mouseout(function () {
-                        $(`#row${index}`).css({ 'color': '' })
+                        $(`#rowX${index}`).css({ 'color': '' })
                     })
                     //.mouseleave(function(){
                     //     $(selector).css('color','red')

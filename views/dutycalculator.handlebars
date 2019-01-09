@@ -2,7 +2,7 @@
     <header class="masthead mb-auto">
         <div class="inner">
             <h1 class="masthead-brand">Duty Estimator</h1>
-            <h2>Enter Info</h2>
+            <h2>Enter Information</h2>
 
         </div>
     </header>
@@ -312,7 +312,7 @@
                     }//end if msg is undefined.
 
                     let html = `<br>
-                <p>Item HTSNO: ${msg[0].htsno}</p>
+                <p>Item HTSNO: <a href='https://hts.usitc.gov/?query=${msg[0].htsno}'>${msg[0].htsno}</a></p>
                 <p id="ItemDescription">Item description: ${msg[0].description}</p>
                 <br>
                 <p>Duty on this item:  ${RawTariff}</p>

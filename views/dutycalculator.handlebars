@@ -66,7 +66,7 @@
               
                     <label for="inputItem" class="col-sm-3 col-form-label">Item Description</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="item"  required="" > 
+                        <input type="text" class="form-control inputlogin" name="inputItem" id="inputItem" placeholder="catagory description word"  required="" > 
                         {{!-- coffee value="6402.91.80.05" --}}
                         <div class="invalid-tooltip">
                             item name is required
@@ -108,6 +108,7 @@
         $('#dutyCalculator').on('click', '#submitButton', function () {
             if (($('#inputItem').val()) === '') {
                 alert('must enter an item')
+                resetContent()
                 return;
             }
 
@@ -121,6 +122,10 @@
                 type: 'GET',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             }).done(function (msg) {
+                console.log(msg)
+                if($.isEmptyObject(msg)){
+                    alert('Please enter an item description that is in the USITC data set. Perhaps try something like "bicycle" instead of "bike".')
+                }
                 checkForMultipleTariffs(msg);
 
 

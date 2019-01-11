@@ -97,13 +97,14 @@
 
 `
             $('#jqueryContent').html(html)
-        }//end reset content
-
-        $('#mainForm').submit(function (event) {
+                    $('#mainForm').submit(function (event) {
             event.preventDefault();
             console.log('inputItem submitted')
             $('#submitButton').click();
         })
+        }//end reset content
+
+
 
         $('#dutyCalculator').on('click', '#submitButton', function () {
             if (($('#inputItem').val()) === '') {
@@ -112,9 +113,6 @@
                 return;
             }
 
-            //let package = $('#mainForm').serializeArray();
-
-            //package.push({ name: 'questionId', value: msg.questionId })
 
             $.ajax({
                 url: "dutycalculator/api/searchHTS",
@@ -122,8 +120,8 @@
                 type: 'GET',
                 contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             }).done(function (msg) {
-           
-                if($.isEmptyObject(msg)){
+
+                if ($.isEmptyObject(msg)) {
                     alert('Please enter an item description that is in the USITC data set. Perhaps try something like "bicycle" instead of "bike".')
                 }
                 checkForMultipleTariffs(msg);
@@ -202,7 +200,7 @@
 
                 $('#tableBody').append(tableHTML);
 
-                
+
                 //add link 
                 /*
                 $('#table').on('click', `#row${htsno}`, function () {
@@ -279,12 +277,11 @@
             $('#countrySelector').off();
             $('#countrySelector').on('change', '#exampleFormControlSelect1', function () {
                 getDuty(msg);
-
             })
 
             //go back to server
             getDuty(msg);
-             
+
 
             function getDuty(msg) {
                 $('#table').empty();
@@ -483,6 +480,8 @@
 
 
                     $('#finialOutput').empty();
+
+
                     $('#calculateButtonDiv').append('<div id="finialOutput"></div> <input type="button" id="calculateButton" value="calculate"><p></p> ')
                     $('#calculateButtonDiv').on('click', '#calculateButton', function () {
                         rateForFinalCalc.totalTariffAmount = 0;
@@ -515,11 +514,23 @@
                         $('#finialOutput').append(finialOutHTML);
 
                     })//end click calculate 
-                }//end if we don't have a calculator button
 
-            }
+
+                }//end if we don't have a calculator button
+                    $('#amountOfItem').keypress(function (event) {
+                        if ((event.keycode || event.which) === 13) {
+                            $('#calculateButton').click();
+                        }
+                    })
+                    $('#valueOfItem').keypress(function (event) {
+                        if ((event.keycode || event.which) === 13) {
+                            $('#calculateButton').click();
+                        }
+                    })
+                  
+            }//end addCalculateButton
 
         }//end check if valueOfItem or amountOfItem
     })//end document ready       
 </script>
-    <script src="<%= serverHost %><%= platformScript %>?partyId=<%= partyId %>" async></script>
+<script src="<%= serverHost %><%= platformScript %>?partyId=<%= partyId %>" async></script>

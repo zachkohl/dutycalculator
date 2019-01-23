@@ -269,8 +269,7 @@ function modelForExport(config) {
  for (i = 0; i < htsData.length; i++) {
      if (htsData[i].htsno === item) {
 //found our item in the big table, now we can workbackwards adding descriptions as we go. 
-console.log('got inside correct answer')
-
+var ThisHtsData = htsData[i]; //for use by 232 tarrif calculator ThisHtsData.tsno
 startIndent = htsData[i].indent;
 var indentArray = [];
 indentArray.push({description:htsData[i].description,htsno:htsData[i].htsno})
@@ -312,15 +311,32 @@ while(n>0){
     html = html + `<li>${spacing}${indentArray[n].description}</li>`;
     }//end for loop
 html = html + '</ul></div>'
-// for(let n=0;n<indentArray.length;n++){
-// //calculate indent:
-// let spacing = ''
-// for (k = 0; k < n; k++) {
-//     spacing = spacing + '     '
-// }//end spacing    
-// html = html + `<p>${spacing}${indentArray[n].description}</p>`;
-// }//end for loop
-//html = html + `<p><strong>${spacing}${indentArray[n].description}</strong></p>`
+
+//CHECK FOR 232 tariffs 
+first3Digits = ThisHtsData.htsno.substring(0,2)
+console.log(first3Digits)
+switch(first3Digits){
+    case '72':
+        html = addWarning(html)
+        break;
+        
+        case '73':
+            html = addWarning(html)
+            break;
+        
+        case '76':
+            html = addWarning(html)
+            break;
+        
+        default:
+            html=html;
+            break;
+}
+
+function addWarning(html){
+    return `<p style='color:red'>Warning: if this article is of iron, steel, or aluminum, then section 232 tariffs likely apply. Contact a trade professional for assistance as these rates can be as high as 50% in addition to regular duty. Exceptions apply.</p>`+html
+}
+
 
      res.send(html)
  })//getHistory
